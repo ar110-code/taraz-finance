@@ -66,7 +66,7 @@ export function Header({
 
         {/* Brand Logo on mobile */}
         <div className="lg:hidden">
-          <BrandLogo size="sm" withText={false} />
+          <BrandLogo size="sm" withText={true} />
         </div>
 
         {todayDate && (
