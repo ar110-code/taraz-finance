@@ -136,7 +136,7 @@ export function CategoryDonut({ categories, compact = false }: CategoryDonutProp
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   {!compact && (
-                    <span className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                    <span className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap privacy-mask">
                       {formatToman(cat.totalAmount)}
                     </span>
                   )}

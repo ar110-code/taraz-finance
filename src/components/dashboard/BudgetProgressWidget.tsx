@@ -66,7 +66,7 @@ export function BudgetProgressWidget({ budgets }: BudgetProgressWidgetProps) {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                    <span className="font-bold text-zinc-900 dark:text-zinc-100 privacy-mask">
                       {formatToman(b.spent || 0)} / {formatToman(b.monthlyLimit)}
                     </span>
                     <span

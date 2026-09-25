@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Menu, Plus, Moon, Sun, Calendar, RotateCcw, Eye, EyeOff, Lock } from 'lucide-react';
+import { Menu, Plus, Moon, Sun, Calendar, RotateCcw, Eye, EyeOff, Lock, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { BrandLogo } from './BrandLogo';
 import { formatShamsiDate } from '@/lib/utils';
@@ -18,7 +18,7 @@ export function Header({
   onOpenTransactionModal,
   onOpenResetModal,
 }: HeaderProps) {
-  const { isPrivacyMode, togglePrivacyMode, lockApp } = useApp();
+  const { isPrivacyMode, togglePrivacyMode, lockApp, openChangePinModal } = useApp();
   const [isDark, setIsDark] = useState(false);
   const [todayDate, setTodayDate] = useState('');
 
@@ -105,6 +105,16 @@ export function Header({
           aria-label="قفل برنامه"
         >
           <Lock className="w-4 h-4 stroke-[1.8]" />
+        </button>
+
+        {/* Change PIN Button */}
+        <button
+          onClick={openChangePinModal}
+          title="تغییر رمز عبور برنامه (PIN)"
+          className="p-2 rounded-xl text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200/60 dark:border-zinc-800/60 transition-colors cursor-pointer min-w-9 min-h-9 flex items-center justify-center"
+          aria-label="تغییر رمز برنامه"
+        >
+          <KeyRound className="w-4 h-4 stroke-[1.8]" />
         </button>
 
         {/* Reset Data Button */}

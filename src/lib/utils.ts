@@ -29,7 +29,7 @@ export function formatToman(amount: number, showSign: boolean = false): string {
     return `+${persianFormatted} تومان`;
   }
   if (isNegative) {
-    return `-${persianFormatted} تومان`;
+    return `−${persianFormatted} تومان`;
   }
   return `${persianFormatted} تومان`;
 }

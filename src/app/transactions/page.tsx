@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function TransactionsPage() {
-  const { openTransactionModal, refreshKey, triggerRefresh } = useApp();
+  const { openTransactionModal, refreshKey, triggerRefresh, formatMoney } = useApp();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
@@ -299,20 +299,20 @@ export default function TransactionsPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="text-left">
                         <div
-                          className={`text-xs font-black flex items-center justify-end gap-0.5 ${
-                            isIncome
-                              ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-zinc-900 dark:text-zinc-50'
-                          }`}
+                          className="text-xs font-black flex items-center justify-end gap-1"
+                          dir="rtl"
                         >
-                          {isIncome ? (
-                            <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" />
-                          ) : (
-                            <ArrowDownLeft className="w-3.5 h-3.5 text-rose-500" />
-                          )}
-                          <span>
-                            {isIncome ? '+' : '-'}
-                            {formatToman(tx.amount)}
+                          <span className={isIncome ? 'text-emerald-500 font-bold select-none' : 'text-rose-500 font-bold select-none'}>
+                            {isIncome ? '+' : '−'}
+                          </span>
+                          <span
+                            className={`privacy-mask ${
+                              isIncome
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-zinc-900 dark:text-zinc-50'
+                            }`}
+                          >
+                            {formatMoney(tx.amount)}
                           </span>
                         </div>
                         <span className="text-[10px] text-zinc-400 block text-left">
@@ -398,23 +398,23 @@ export default function TransactionsPage() {
 
                         {/* Amount */}
                         <td className="py-3.5 px-4 text-left">
-                          <span
-                            className={`font-black inline-flex items-center gap-1 ${
-                              isIncome
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-zinc-900 dark:text-zinc-100'
-                            }`}
+                          <div
+                            className="inline-flex items-center gap-1 font-black"
+                            dir="rtl"
                           >
-                            {isIncome ? (
-                              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" />
-                            ) : (
-                              <ArrowDownLeft className="w-3.5 h-3.5 text-rose-500" />
-                            )}
-                            <span>
-                              {isIncome ? '+' : '-'}
-                              {formatToman(tx.amount)}
+                            <span className={isIncome ? 'text-emerald-500 font-bold select-none' : 'text-rose-500 font-bold select-none'}>
+                              {isIncome ? '+' : '−'}
                             </span>
-                          </span>
+                            <span
+                              className={`privacy-mask ${
+                                isIncome
+                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  : 'text-zinc-900 dark:text-zinc-100'
+                              }`}
+                            >
+                              {formatMoney(tx.amount)}
+                            </span>
+                          </div>
                         </td>
 
                         {/* Actions */}

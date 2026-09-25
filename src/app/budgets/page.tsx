@@ -13,7 +13,7 @@ import { Budget } from '@/types';
 import { Target, Plus, AlertTriangle, CheckCircle2, AlertCircle, Trash2, Edit2 } from 'lucide-react';
 
 export default function BudgetsPage() {
-  const { refreshKey, triggerRefresh } = useApp();
+  const { refreshKey, triggerRefresh, formatMoney } = useApp();
 
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,8 +101,8 @@ export default function BudgetsPage() {
           <span className="text-[11px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">
             مجموع سقف بودجه‌های ماه
           </span>
-          <div className="text-base sm:text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
-            {formatToman(totalLimit)}
+          <div className="text-base sm:text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight privacy-mask">
+            {formatMoney(totalLimit)}
           </div>
           <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
             سقف مصوب برای {toPersianDigits(budgets.length)} دسته‌بندی
@@ -113,8 +113,8 @@ export default function BudgetsPage() {
           <span className="text-[11px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">
             کل مبالغ مصرف‌شده
           </span>
-          <div className="text-base sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
-            {formatToman(totalSpent)}
+          <div className="text-base sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight privacy-mask">
+            {formatMoney(totalSpent)}
           </div>
           <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
             {toPersianDigits(overallPct)}٪ از کل سقف بودجه مصرف شده
@@ -125,8 +125,8 @@ export default function BudgetsPage() {
           <span className="text-[11px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">
             باقی‌مانده مجاز هزینه
           </span>
-          <div className="text-base sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-            {formatToman(Math.max(0, totalLimit - totalSpent))}
+          <div className="text-base sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight privacy-mask">
+            {formatMoney(Math.max(0, totalLimit - totalSpent))}
           </div>
           <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
             ظرفیت آزاد برای مخارج تا پایان ماه
@@ -187,7 +187,7 @@ export default function BudgetsPage() {
                           {b.category?.name}
                         </h3>
                         <span className="text-[11px] text-zinc-400">
-                          سقف: {formatToman(b.monthlyLimit)}
+                          سقف: <span className="privacy-mask">{formatMoney(b.monthlyLimit)}</span>
                         </span>
                       </div>
                     </div>
@@ -214,8 +214,8 @@ export default function BudgetsPage() {
 
                   {/* Amounts */}
                   <div className="flex items-baseline justify-between text-xs mt-4 mb-2">
-                    <span className="font-bold text-zinc-900 dark:text-zinc-50 text-sm">
-                      {formatToman(b.spent || 0)}
+                    <span className="font-bold text-zinc-900 dark:text-zinc-50 text-sm privacy-mask">
+                      {formatMoney(b.spent || 0)}
                     </span>
                     <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${badgeBg}`}>
                       {toPersianDigits(b.percentage || 0)}٪
@@ -238,7 +238,7 @@ export default function BudgetsPage() {
                     <span className="text-zinc-600 dark:text-zinc-400">{statusText}</span>
                   </div>
                   <span className="font-semibold text-zinc-500 dark:text-zinc-400">
-                    باقی: {formatToman(b.remaining || 0)}
+                    باقی: <span className="privacy-mask">{formatMoney(b.remaining || 0)}</span>
                   </span>
                 </div>
               </Card>

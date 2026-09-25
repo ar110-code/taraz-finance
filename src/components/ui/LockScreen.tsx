@@ -6,9 +6,10 @@ import { toPersianDigits } from '@/lib/utils';
 
 interface LockScreenProps {
   onUnlock: (pin: string) => boolean;
+  onOpenChangePin?: () => void;
 }
 
-export function LockScreen({ onUnlock }: LockScreenProps) {
+export function LockScreen({ onUnlock, onOpenChangePin }: LockScreenProps) {
   const [pin, setPin] = useState('');
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -140,6 +141,18 @@ export function LockScreen({ onUnlock }: LockScreenProps) {
             <Delete className="w-6 h-6" />
           </button>
         </div>
+
+        {/* Change PIN Trigger */}
+        {onOpenChangePin && (
+          <button
+            type="button"
+            onClick={onOpenChangePin}
+            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer pt-2 select-none"
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            <span>تغییر رمز عبور برنامه (PIN)</span>
+          </button>
+        )}
       </div>
     </div>
   );

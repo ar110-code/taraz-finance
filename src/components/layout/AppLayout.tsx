@@ -6,12 +6,15 @@ import { Header } from './Header';
 import { TransactionModal } from '@/components/transactions/TransactionModal';
 import { ResetConfirmModal } from '@/components/ui/ResetConfirmModal';
 import { LockScreen } from '@/components/ui/LockScreen';
+import { ChangePinModal } from '@/components/ui/ChangePinModal';
 import { BottomNav } from './BottomNav';
 import { formatToman } from '@/lib/utils';
 
 interface AppContextType {
   openTransactionModal: () => void;
   openResetModal: () => void;
+  openChangePinModal: () => void;
+  appPin: string;
   refreshKey: number;
   triggerRefresh: () => void;
   isPrivacyMode: boolean;
@@ -19,12 +22,15 @@ interface AppContextType {
   isLocked: boolean;
   lockApp: () => void;
   unlockApp: (pin: string) => boolean;
+  changePin: (newPin: string) => void;
   formatMoney: (amount: number, showSign?: boolean) => string;
 }
 
 const AppContext = createContext<AppContextType>({
   openTransactionModal: () => {},
   openResetModal: () => {},
+  openChangePinModal: () => {},
+  appPin: '1234',
   refreshKey: 0,
   triggerRefresh: () => {},
   isPrivacyMode: false,
@@ -32,6 +38,7 @@ const AppContext = createContext<AppContextType>({
   isLocked: false,
   lockApp: () => {},
   unlockApp: () => false,
+  changePin: () => {},
   formatMoney: (amount) => formatToman(amount),
 });
 
@@ -50,6 +57,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   // App Lock State
   const [isLocked, setIsLocked] = useState(false);
   const [appPin, setAppPin] = useState('1234');
+  const [isChangePinOpen, setIsChangePinOpen] = useState(false);
+
+  const changePin = (newPin: string) => {
+    setAppPin(newPin);
+    localStorage.setItem('taraz_app_pin', newPin);
+  };
 
   useEffect(() => {
     // Load persisted privacy mode
@@ -121,6 +134,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       value={{
         openTransactionModal: () => setTxModalOpen(true),
         openResetModal: () => setResetModalOpen(true),
+        openChangePinModal: () => setIsChangePinOpen(true),
+        appPin,
         refreshKey,
         triggerRefresh,
         isPrivacyMode,
@@ -128,12 +143,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         isLocked,
         lockApp,
         unlockApp,
+        changePin,
         formatMoney,
       }}
     >
       <div className={`min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans ${isPrivacyMode ? 'privacy-mode' : ''}`}>
         {/* App Lock Screen Overlay */}
-        {isLocked && <LockScreen onUnlock={unlockApp} />}
+        {isLocked && (
+          <LockScreen
+            onUnlock={unlockApp}
+            onOpenChangePin={() => setIsChangePinOpen(true)}
+          />
+        )}
 
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -169,6 +190,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           onClose={() => setResetModalOpen(false)}
           onConfirm={handleConfirmReset}
           isLoading={isResetting}
+        />
+
+        {/* Global Change PIN Modal */}
+        <ChangePinModal
+          isOpen={isChangePinOpen}
+          onClose={() => setIsChangePinOpen(false)}
+          currentPin={appPin}
+          onSuccess={changePin}
         />
       </div>
     </AppContext.Provider>

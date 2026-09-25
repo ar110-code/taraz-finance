@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { formatToman, formatShamsiDate } from '@/lib/utils';
 import { ArrowLeft, ArrowDownLeft, ArrowUpRight, Trash2 } from 'lucide-react';
 import { Transaction } from '@/types';
+import { useApp } from '@/components/layout/AppLayout';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -21,6 +22,7 @@ export function RecentTransactions({
   onDeleteTransaction,
   onOpenModal,
 }: RecentTransactionsProps) {
+  const { formatMoney } = useApp();
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex-row items-center justify-between pb-2 mb-2">
@@ -84,20 +86,20 @@ export function RecentTransactions({
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="text-left">
                     <div
-                      className={`text-sm sm:text-base font-black flex items-center justify-end gap-1 ${
-                        isIncome
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-zinc-900 dark:text-zinc-50'
-                      }`}
+                      className="text-sm sm:text-base font-black flex items-center justify-end gap-1"
+                      dir="rtl"
                     >
-                      {isIncome ? (
-                        <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                      ) : (
-                        <ArrowDownLeft className="w-4 h-4 text-rose-500" />
-                      )}
-                      <span>
-                        {isIncome ? '+' : '-'}
-                        {formatToman(tx.amount)}
+                      <span className={isIncome ? 'text-emerald-500 font-bold select-none' : 'text-rose-500 font-bold select-none'}>
+                        {isIncome ? '+' : '−'}
+                      </span>
+                      <span
+                        className={`privacy-mask ${
+                          isIncome
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-zinc-900 dark:text-zinc-50'
+                        }`}
+                      >
+                        {formatMoney(tx.amount)}
                       </span>
                     </div>
                     {tx.note && (

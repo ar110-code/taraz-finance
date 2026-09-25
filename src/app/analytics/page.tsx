@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
-  const { refreshKey } = useApp();
+  const { refreshKey, formatMoney } = useApp();
 
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -153,8 +153,8 @@ export default function AnalyticsPage() {
                   </div>
 
                   <div className="text-left shrink-0">
-                    <div className="font-black text-xs sm:text-sm text-zinc-900 dark:text-zinc-50">
-                      {formatToman(acc.balance)}
+                    <div className="font-black text-xs sm:text-sm text-zinc-900 dark:text-zinc-50 privacy-mask">
+                      {formatMoney(acc.balance)}
                     </div>
                     <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400">
                       {toPersianDigits(sharePct)}٪ از کل
@@ -196,8 +196,8 @@ export default function AnalyticsPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100">
-                        {formatToman(cat.totalAmount)}
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100 privacy-mask">
+                        {formatMoney(cat.totalAmount)}
                       </span>
                       <span className="text-[11px] font-bold text-zinc-400 min-w-8 text-left">
                         {toPersianDigits(cat.percentage)}٪

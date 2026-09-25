@@ -162,12 +162,14 @@ export function CashFlowChart({ data, compact = false }: CashFlowChartProps) {
               <span className="text-[10px] text-zinc-400 block">
                 {data[hoveredIndex].monthName}
               </span>
-              <div className="flex items-center gap-3 mt-0.5">
-                <span className="text-emerald-400 font-bold">
-                  +{formatToman(data[hoveredIndex].income)}
+              <div className="flex items-center gap-3 mt-0.5" dir="rtl">
+                <span className="text-emerald-400 font-bold inline-flex items-center gap-0.5">
+                  <span className="select-none">+</span>
+                  <span>{formatToman(data[hoveredIndex].income)}</span>
                 </span>
-                <span className="text-rose-400 font-bold">
-                  -{formatToman(data[hoveredIndex].expense)}
+                <span className="text-rose-400 font-bold inline-flex items-center gap-0.5">
+                  <span className="select-none">−</span>
+                  <span>{formatToman(data[hoveredIndex].expense)}</span>
                 </span>
               </div>
             </div>

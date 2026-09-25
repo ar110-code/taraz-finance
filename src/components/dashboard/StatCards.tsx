@@ -72,7 +72,7 @@ export function StatCards({ analytics }: StatCardsProps) {
             </div>
 
             <div className="space-y-0.5 sm:space-y-1">
-              <div className="text-sm sm:text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight truncate">
+              <div className="text-sm sm:text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight truncate privacy-mask">
                 {card.value}
               </div>
               <p
