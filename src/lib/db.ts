@@ -2,8 +2,9 @@ import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 import fs from 'node:fs';
 
-const DB_DIR = path.join(process.cwd(), 'data');
-if (!fs.existsSync(DB_DIR)) {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+if (!fs.existsSync(/*turbopackIgnore: true*/ DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
 }
 

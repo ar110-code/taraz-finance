@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.github
+android
+taraz-finance.apk
+build-apk.ps1
+data/*.sqlite*
+*.log
