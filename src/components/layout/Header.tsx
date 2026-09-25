@@ -18,39 +18,12 @@ export function Header({
   onOpenTransactionModal,
   onOpenResetModal,
 }: HeaderProps) {
-  const { isPrivacyMode, togglePrivacyMode, lockApp, openChangePinModal } = useApp();
-  const [isDark, setIsDark] = useState(false);
+  const { isPrivacyMode, togglePrivacyMode, lockApp, openChangePinModal, isDarkMode, toggleDarkMode } = useApp();
   const [todayDate, setTodayDate] = useState('');
 
   useEffect(() => {
-    // Check initial theme
-    const isDarkMode =
-      localStorage.getItem('taraz-theme') === 'dark' ||
-      (!('taraz-theme' in localStorage) &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    setIsDark(isDarkMode);
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-
-    // Set today Shamsi date
     setTodayDate(formatShamsiDate(new Date().toISOString()));
   }, []);
-
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('taraz-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('taraz-theme', 'light');
-    }
-  };
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
@@ -126,14 +99,19 @@ export function Header({
           <RotateCcw className="w-4 h-4 stroke-[1.8]" />
         </button>
 
-        {/* Dark/Light Theme Button */}
+        {/* Dark/Light Theme Toggle — now connected to global AppContext */}
         <button
-          onClick={toggleTheme}
+          onClick={toggleDarkMode}
           aria-label="تغییر حالت تیره/روشن"
-          className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 transition-colors cursor-pointer min-w-9 min-h-9 flex items-center justify-center"
+          title={isDarkMode ? 'حالت روشن' : 'حالت تیره'}
+          className={`p-2 rounded-xl border transition-all duration-200 cursor-pointer min-w-9 min-h-9 flex items-center justify-center ${
+            isDarkMode
+              ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+              : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border-zinc-200/60'
+          }`}
         >
-          {isDark ? (
-            <Sun className="w-4 h-4 text-amber-400 stroke-[1.8]" />
+          {isDarkMode ? (
+            <Sun className="w-4 h-4 stroke-[1.8]" />
           ) : (
             <Moon className="w-4 h-4 text-indigo-500 stroke-[1.8]" />
           )}

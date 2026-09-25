@@ -24,6 +24,8 @@ interface AppContextType {
   unlockApp: (pin: string) => boolean;
   changePin: (newPin: string) => void;
   formatMoney: (amount: number, showSign?: boolean) => string;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 const AppContext = createContext<AppContextType>({
@@ -40,6 +42,8 @@ const AppContext = createContext<AppContextType>({
   unlockApp: () => false,
   changePin: () => {},
   formatMoney: (amount) => formatToman(amount),
+  isDarkMode: false,
+  toggleDarkMode: () => {},
 });
 
 export const useApp = () => useContext(AppContext);
@@ -59,6 +63,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [appPin, setAppPin] = useState('1234');
   const [isChangePinOpen, setIsChangePinOpen] = useState(false);
 
+  // Dark Mode State
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('taraz_dark_mode', String(next));
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  };
+
   const changePin = (newPin: string) => {
     setAppPin(newPin);
     localStorage.setItem('taraz_app_pin', newPin);
@@ -75,6 +95,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     const savedPin = localStorage.getItem('taraz_app_pin');
     if (savedPin) {
       setAppPin(savedPin);
+    }
+
+    // Load persisted dark mode (also check system preference as fallback)
+    const savedDark = localStorage.getItem('taraz_dark_mode');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedDark !== null ? savedDark === 'true' : prefersDark;
+    if (shouldBeDark) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
     }
   }, []);
 
@@ -145,6 +174,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         unlockApp,
         changePin,
         formatMoney,
+        isDarkMode,
+        toggleDarkMode,
       }}
     >
       <div className={`min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans ${isPrivacyMode ? 'privacy-mode' : ''}`}>

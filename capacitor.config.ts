@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: 'تراز',
   webDir: 'public',
   server: {
+    url: 'https://taraz-finance-production.up.railway.app',
     androidScheme: 'https',
-    cleartext: true,
+    cleartext: false,
   },
   android: {
     allowMixedContent: true,
