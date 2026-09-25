@@ -138,12 +138,14 @@ export function CashFlowChart({ data, compact = false }: CashFlowChartProps) {
                 {/* Month Label */}
                 <text
                   x={groupX + groupWidth / 2}
-                  y={chartHeight + (compact ? 18 : 24)}
+                  y={chartHeight + (compact ? 15 : 20)}
                   textAnchor="middle"
-                  className={`text-[10px] sm:text-[11px] font-sans transition-colors ${
+                  fontSize={compact ? 8 : 9.5}
+                  style={{ fontSize: compact ? '8px' : '9.5px' }}
+                  className={`text-[8px] sm:text-[9px] font-sans transition-colors ${
                     isHovered
                       ? 'fill-indigo-600 dark:fill-indigo-400 font-bold'
-                      : 'fill-zinc-500 dark:fill-zinc-400 font-medium'
+                      : 'fill-zinc-400 dark:fill-zinc-500 font-normal'
                   }`}
                 >
                   {compact ? (SHORT_MONTHS[item.monthName] || item.monthName) : item.monthName}
