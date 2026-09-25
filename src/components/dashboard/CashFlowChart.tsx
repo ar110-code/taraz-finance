@@ -135,20 +135,20 @@ export function CashFlowChart({ data, compact = false }: CashFlowChartProps) {
                   }`}
                 />
 
-                {/* Month Label */}
+                {/* Month Label (Full Name) */}
                 <text
                   x={groupX + groupWidth / 2}
-                  y={chartHeight + (compact ? 15 : 20)}
+                  y={chartHeight + (compact ? 16 : 21)}
                   textAnchor="middle"
-                  fontSize={compact ? 8 : 9.5}
-                  style={{ fontSize: compact ? '8px' : '9.5px' }}
-                  className={`text-[8px] sm:text-[9px] font-sans transition-colors ${
+                  fontSize={compact ? 7.5 : 9.5}
+                  style={{ fontSize: compact ? '7.5px' : '9.5px' }}
+                  className={`font-sans transition-colors ${
                     isHovered
                       ? 'fill-indigo-600 dark:fill-indigo-400 font-bold'
                       : 'fill-zinc-400 dark:fill-zinc-500 font-normal'
                   }`}
                 >
-                  {compact ? (SHORT_MONTHS[item.monthName] || item.monthName) : item.monthName}
+                  {item.monthName}
                 </text>
               </g>
             );
