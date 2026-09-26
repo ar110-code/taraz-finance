@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '@/components/layout/AppLayout';
+import { getLoans, payLoanInstallment, deleteLoan } from '@/lib/client-api';
 
 export default function LoansPage() {
   const { formatMoney } = useApp();
@@ -34,11 +35,8 @@ export default function LoansPage() {
   const fetchLoans = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/loans');
-      const data = await res.json();
-      if (data.success) {
-        setLoans(data.data);
-      }
+      const data = await getLoans();
+      setLoans(data);
     } catch (err) {
       console.error('Failed to fetch loans:', err);
     } finally {
@@ -53,18 +51,14 @@ export default function LoansPage() {
   const handlePayInstallment = async (id: string) => {
     setPayingId(id);
     try {
-      const res = await fetch(`/api/loans/${id}/pay`, { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        if (typeof window !== 'undefined') {
-          confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-        }
-        fetchLoans();
-      } else {
-        alert(data.error?.message || 'خطا در پرداخت قسط');
+      await payLoanInstallment(id);
+      if (typeof window !== 'undefined') {
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       }
+      fetchLoans();
     } catch (err) {
       console.error('Error paying installment:', err);
+      alert('خطا در پرداخت قسط');
     } finally {
       setPayingId(null);
     }
@@ -73,11 +67,8 @@ export default function LoansPage() {
   const handleDeleteLoan = async (id: string) => {
     if (!confirm('آیا از حذف این وام اطمینان دارید؟')) return;
     try {
-      const res = await fetch(`/api/loans/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        fetchLoans();
-      }
+      await deleteLoan(id);
+      fetchLoans();
     } catch (err) {
       console.error('Error deleting loan:', err);
     }

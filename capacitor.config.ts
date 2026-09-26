@@ -1,18 +1,13 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+﻿import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.taraz.finance',
   appName: 'تراز',
-  webDir: 'public',
-  server: {
-    url: 'https://taraz-finance-production.up.railway.app',
-    androidScheme: 'https',
-    cleartext: false,
-  },
+  webDir: 'out',
   android: {
-    allowMixedContent: true,
+    allowMixedContent: false,
     captureInput: true,
-    webContentsDebuggingEnabled: true,
+    webContentsDebuggingEnabled: false,
   },
 };
 

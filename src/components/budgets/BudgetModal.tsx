@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Category } from '@/types';
 import { amountToPersianWords, toEnglishDigits, toPersianDigits } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import { getCategories, createBudget } from '@/lib/client-api';
 
 interface BudgetModalProps {
   isOpen: boolean;
@@ -29,20 +30,19 @@ export function BudgetModal({
   useEffect(() => {
     if (isOpen) {
       setErrorMessage('');
-      fetch('/api/categories?type=expense')
-        .then((r) => r.json())
-        .then((res) => {
-          if (res.success) {
-            setCategories(res.data);
-            if (existingBudget) {
-              setCategoryId(existingBudget.categoryId);
-              setAmountRaw(existingBudget.monthlyLimit.toLocaleString('en-US'));
-            } else if (res.data.length > 0) {
-              setCategoryId(res.data[0].id);
-              setAmountRaw('');
-            }
+      getCategories()
+        .then((all) => {
+          const expenseCats = all.filter((c) => c.type === 'expense');
+          setCategories(expenseCats);
+          if (existingBudget) {
+            setCategoryId(existingBudget.categoryId);
+            setAmountRaw(existingBudget.monthlyLimit.toLocaleString('en-US'));
+          } else if (expenseCats.length > 0) {
+            setCategoryId(expenseCats[0].id);
+            setAmountRaw('');
           }
-        });
+        })
+        .catch((err) => console.error('Failed to load categories:', err));
     }
   }, [isOpen, existingBudget]);
 
@@ -74,21 +74,10 @@ export function BudgetModal({
     setErrorMessage('');
 
     try {
-      const currentPeriod = new Date().toISOString().slice(0, 7);
-      const res = await fetch('/api/budgets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          categoryId,
-          monthlyLimit: numAmount,
-          period: currentPeriod,
-        }),
+      await createBudget({
+        categoryId,
+        monthlyLimit: numAmount,
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data?.error?.message || 'خطا در ثبت بودجه');
-      }
 
       if (typeof window !== 'undefined') {
         confetti({

@@ -19,6 +19,7 @@ import {
   ArrowUpRight,
   Sparkles,
 } from 'lucide-react';
+import { getCategories, getAccounts, getTransactions, deleteTransaction, exportToCSV } from '@/lib/client-api';
 
 export default function TransactionsPage() {
   const { openTransactionModal, refreshKey, triggerRefresh, formatMoney } = useApp();
@@ -38,11 +39,11 @@ export default function TransactionsPage() {
   // Fetch Categories & Accounts
   useEffect(() => {
     Promise.all([
-      fetch('/api/categories').then((r) => r.json()),
-      fetch('/api/accounts').then((r) => r.json()),
-    ]).then(([catRes, accRes]) => {
-      if (catRes.success) setCategories(catRes.data);
-      if (accRes.success) setAccounts(accRes.data);
+      getCategories(),
+      getAccounts(),
+    ]).then(([cats, accs]) => {
+      setCategories(cats);
+      setAccounts(accs);
     });
   }, []);
 
@@ -50,19 +51,15 @@ export default function TransactionsPage() {
   const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.append('query', searchQuery);
-      if (selectedType) params.append('type', selectedType);
-      if (selectedCategory) params.append('categoryId', selectedCategory);
-      if (selectedAccount) params.append('accountId', selectedAccount);
-      params.append('limit', '100');
-
-      const res = await fetch(`/api/transactions?${params.toString()}`);
-      const data = await res.json();
-      if (data.success) {
-        setTransactions(data.data.transactions);
-        setTotal(data.data.total);
-      }
+      const result = await getTransactions({
+        query: searchQuery || undefined,
+        type: (selectedType as TransactionType) || undefined,
+        categoryId: selectedCategory || undefined,
+        accountId: selectedAccount || undefined,
+        limit: 100,
+      });
+      setTransactions(result.transactions);
+      setTotal(result.total);
     } catch (err) {
       console.error('Failed to fetch transactions:', err);
     } finally {
@@ -80,11 +77,8 @@ export default function TransactionsPage() {
     }
 
     try {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        triggerRefresh();
-      }
+      await deleteTransaction(id);
+      triggerRefresh();
     } catch (err) {
       console.error('Failed to delete transaction:', err);
     }
@@ -97,10 +91,13 @@ export default function TransactionsPage() {
     setSelectedAccount('');
   };
 
-  const handleExportCSV = () => {
-    const params = new URLSearchParams();
-    if (selectedType) params.append('type', selectedType);
-    window.location.href = `/api/export?${params.toString()}`;
+  const handleExportCSV = async () => {
+    const csv = await exportToCSV(selectedType || undefined);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'taraz-export.csv'; a.click();
+    URL.revokeObjectURL(url);
   };
 
   const hasActiveFilters =

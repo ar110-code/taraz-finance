@@ -9,6 +9,7 @@ import { LockScreen } from '@/components/ui/LockScreen';
 import { ChangePinModal } from '@/components/ui/ChangePinModal';
 import { BottomNav } from './BottomNav';
 import { formatToman } from '@/lib/utils';
+import { resetDatabase, recordSmsTransaction } from '@/lib/client-api';
 
 interface AppContextType {
   openTransactionModal: () => void;
@@ -105,6 +106,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');
     }
+
+    // Attach native SMS auto-recorder
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).__tarazSmsRecord = async (smsData: any) => {
+      try {
+        await recordSmsTransaction(smsData);
+        triggerRefresh();
+      } catch (err) {
+        console.error('Failed to record native SMS:', err);
+      }
+    };
   }, []);
 
   const triggerRefresh = () => {
@@ -141,16 +153,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const handleConfirmReset = async (mode: 'zero' | 'seed' = 'zero') => {
     setIsResetting(true);
     try {
-      const res = await fetch('/api/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setResetModalOpen(false);
-        triggerRefresh();
-      }
+      await resetDatabase(mode);
+      setResetModalOpen(false);
+      triggerRefresh();
     } catch (err) {
       console.error('Failed to reset data:', err);
     } finally {

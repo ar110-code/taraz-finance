@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Account } from '@/types';
 import { toEnglishDigits, toPersianDigits, amountToPersianWords } from '@/lib/utils';
 import { Landmark, Calendar, DollarSign, Layers } from 'lucide-react';
+import { getAccounts, createLoan } from '@/lib/client-api';
 
 interface CreateLoanModalProps {
   isOpen: boolean;
@@ -31,14 +32,14 @@ export function CreateLoanModal({ isOpen, onClose, onSuccess }: CreateLoanModalP
   useEffect(() => {
     if (isOpen) {
       setErrorMsg('');
-      fetch('/api/accounts')
-        .then((r) => r.json())
-        .then((res) => {
-          if (res.success && res.data.length > 0) {
-            setAccounts(res.data);
-            if (!accountId) setAccountId(res.data[0].id);
+      getAccounts()
+        .then((accs) => {
+          if (accs.length > 0) {
+            setAccounts(accs);
+            if (!accountId) setAccountId(accs[0].id);
           }
-        });
+        })
+        .catch((err) => console.error('Failed to load accounts:', err));
     }
   }, [isOpen]);
 
@@ -90,26 +91,17 @@ export function CreateLoanModal({ isOpen, onClose, onSuccess }: CreateLoanModalP
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/loans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title.trim(),
-          lender: lender.trim(),
-          totalAmount: numTotal,
-          installmentAmount: numInstallment,
-          totalInstallments: parseInt(totalInstallments, 10) || 12,
-          paidInstallments: parseInt(paidInstallments, 10) || 0,
-          dueDay: parseInt(dueDay, 10) || 5,
-          startDate,
-          accountId,
-        }),
+      await createLoan({
+        title: title.trim(),
+        lender: lender.trim(),
+        totalAmount: numTotal,
+        installmentAmount: numInstallment,
+        totalInstallments: parseInt(totalInstallments, 10) || 12,
+        paidInstallments: parseInt(paidInstallments, 10) || 0,
+        dueDay: parseInt(dueDay, 10) || 5,
+        startDate,
+        accountId,
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data?.error?.message || 'خطا در ثبت وام');
-      }
 
       // Reset
       setTitle('');

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { AnalyticsSummary, Transaction, Budget, Loan } from '@/types';
 import { LoanAlarmBanner } from '@/components/loans/LoanAlarmBanner';
 import { Plus, RefreshCw, RotateCcw } from 'lucide-react';
+import { getAnalytics, getTransactions, getBudgets, getLoans, deleteTransaction } from '@/lib/client-api';
 
 export default function DashboardPage() {
   const { openTransactionModal, openResetModal, refreshKey, triggerRefresh } = useApp();
@@ -23,17 +24,16 @@ export default function DashboardPage() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const [analyticsRes, txRes, budgetRes, loansRes] = await Promise.all([
-        fetch('/api/analytics').then((r) => r.json()),
-        fetch('/api/transactions?limit=6').then((r) => r.json()),
-        fetch('/api/budgets').then((r) => r.json()),
-        fetch('/api/loans').then((r) => r.json()),
+      const [analytics, txResult, budgets, loans] = await Promise.all([
+        getAnalytics(),
+        getTransactions({ limit: 6 }),
+        getBudgets(),
+        getLoans(),
       ]);
-
-      if (analyticsRes.success) setAnalytics(analyticsRes.data);
-      if (txRes.success) setRecentTransactions(txRes.data.transactions);
-      if (budgetRes.success) setBudgets(budgetRes.data);
-      if (loansRes.success) setLoans(loansRes.data);
+      setAnalytics(analytics);
+      setRecentTransactions(txResult.transactions);
+      setBudgets(budgets);
+      setLoans(loans);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -55,11 +55,8 @@ export default function DashboardPage() {
     if (!confirm('آیا از حذف این تراکنش اطمینان دارید؟')) return;
 
     try {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        triggerRefresh();
-      }
+      await deleteTransaction(id);
+      triggerRefresh();
     } catch (err) {
       console.error('Failed to delete transaction:', err);
     }

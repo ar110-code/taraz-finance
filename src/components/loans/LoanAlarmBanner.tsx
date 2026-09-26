@@ -8,6 +8,8 @@ import { BellRing, CheckCircle2, ChevronLeft, CreditCard, Sparkles } from 'lucid
 import confetti from 'canvas-confetti';
 import { useApp } from '@/components/layout/AppLayout';
 
+import { payLoanInstallment } from '@/lib/client-api';
+
 interface LoanAlarmBannerProps {
   loans: Loan[];
   onRefresh: () => void;
@@ -25,22 +27,18 @@ export function LoanAlarmBanner({ loans, onRefresh }: LoanAlarmBannerProps) {
   const handlePayInstallment = async (loan: Loan) => {
     setPayingId(loan.id);
     try {
-      const res = await fetch(`/api/loans/${loan.id}/pay`, { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        if (typeof window !== 'undefined') {
-          confetti({
-            particleCount: 60,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        }
-        onRefresh();
-      } else {
-        alert(data.error?.message || 'خطا در پرداخت قسط');
+      await payLoanInstallment(loan.id);
+      if (typeof window !== 'undefined') {
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
       }
+      onRefresh();
     } catch (err) {
       console.error('Error paying installment:', err);
+      alert('خطا در پرداخت قسط');
     } finally {
       setPayingId(null);
     }

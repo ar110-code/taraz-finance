@@ -11,6 +11,7 @@ import { BudgetModal } from '@/components/budgets/BudgetModal';
 import { formatToman, toPersianDigits } from '@/lib/utils';
 import { Budget } from '@/types';
 import { Target, Plus, AlertTriangle, CheckCircle2, AlertCircle, Trash2, Edit2 } from 'lucide-react';
+import { getBudgets, deleteBudget } from '@/lib/client-api';
 
 export default function BudgetsPage() {
   const { refreshKey, triggerRefresh, formatMoney } = useApp();
@@ -23,11 +24,8 @@ export default function BudgetsPage() {
   const fetchBudgets = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/budgets');
-      const data = await res.json();
-      if (data.success) {
-        setBudgets(data.data);
-      }
+      const data = await getBudgets();
+      setBudgets(data);
     } catch (err) {
       console.error('Failed to fetch budgets:', err);
     } finally {
@@ -43,11 +41,8 @@ export default function BudgetsPage() {
     if (!confirm('آیا از حذف این سقف بودجه اطمینان دارید؟')) return;
 
     try {
-      const res = await fetch(`/api/budgets?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        triggerRefresh();
-      }
+      await deleteBudget(id);
+      triggerRefresh();
     } catch (err) {
       console.error('Failed to delete budget:', err);
     }

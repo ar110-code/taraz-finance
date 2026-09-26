@@ -17,6 +17,7 @@ import {
   Lightbulb,
   Wallet,
 } from 'lucide-react';
+import { getAnalytics, getAccounts } from '@/lib/client-api';
 
 export default function AnalyticsPage() {
   const { refreshKey, formatMoney } = useApp();
@@ -28,12 +29,12 @@ export default function AnalyticsPage() {
   useEffect(() => {
     setIsLoading(true);
     Promise.all([
-      fetch('/api/analytics').then((r) => r.json()),
-      fetch('/api/accounts').then((r) => r.json()),
+      getAnalytics(),
+      getAccounts(),
     ])
-      .then(([anRes, accRes]) => {
-        if (anRes.success) setAnalytics(anRes.data);
-        if (accRes.success) setAccounts(accRes.data);
+      .then(([analyticsData, accsData]) => {
+        setAnalytics(analyticsData);
+        setAccounts(accsData);
       })
       .finally(() => setIsLoading(false));
   }, [refreshKey]);

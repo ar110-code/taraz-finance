@@ -8,6 +8,7 @@ import { amountToPersianWords, toEnglishDigits, toPersianDigits, formatToman } f
 import { parseBankSMS } from '@/lib/smsParser';
 import { ArrowDownLeft, ArrowUpRight, DollarSign, Calendar, Tag, CreditCard, AlignLeft, Sparkles, MessageSquare, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { getCategories, getAccounts, createTransaction } from '@/lib/client-api';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -63,18 +64,17 @@ export function TransactionModal({ isOpen, onClose, onSuccess }: TransactionModa
     if (isOpen) {
       setLoadingData(true);
       setErrorMessage('');
-      Promise.all([
-        fetch('/api/categories').then((r) => r.json()),
-        fetch('/api/accounts').then((r) => r.json()),
-      ])
-        .then(([catRes, accRes]) => {
-          if (catRes.success) setCategories(catRes.data);
-          if (accRes.success) {
-            setAccounts(accRes.data);
-            if (accRes.data.length > 0 && !accountId) {
-              setAccountId(accRes.data[0].id);
-            }
+      Promise.all([getCategories(), getAccounts()])
+        .then(([cats, accs]) => {
+          setCategories(cats);
+          setAccounts(accs);
+          if (accs.length > 0 && !accountId) {
+            setAccountId(accs[0].id);
           }
+        })
+        .catch((err) => {
+          console.error('Failed to load data:', err);
+          setErrorMessage('خطا در بارگذاری اطلاعات');
         })
         .finally(() => setLoadingData(false));
     }
@@ -192,24 +192,15 @@ export function TransactionModal({ isOpen, onClose, onSuccess }: TransactionModa
     setErrorMessage('');
 
     try {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type,
-          amount: numAmount,
-          title: title.trim(),
-          categoryId,
-          accountId,
-          date,
-          note: note.trim() || undefined,
-        }),
+      await createTransaction({
+        type,
+        amount: numAmount,
+        title: title.trim(),
+        categoryId,
+        accountId,
+        date,
+        note: note.trim() || undefined,
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data?.error?.message || 'خطا در ثبت تراکنش');
-      }
 
       // Celebratory micro-interaction for successful transaction
       if (typeof window !== 'undefined') {
